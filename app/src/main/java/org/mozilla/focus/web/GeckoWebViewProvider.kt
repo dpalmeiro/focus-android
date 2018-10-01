@@ -79,8 +79,6 @@ class GeckoWebViewProvider : IWebViewProvider {
             // Safe browsing is not ready #3309
             runtimeSettingsBuilder.blockMalware(false)
             runtimeSettingsBuilder.blockPhishing(false)
-            runtimeSettingsBuilder.nativeCrashReportingEnabled(false)
-            runtimeSettingsBuilder.javaCrashReportingEnabled(false)
             geckoRuntime =
                     GeckoRuntime.create(context.applicationContext, runtimeSettingsBuilder.build())
         }
@@ -148,7 +146,6 @@ class GeckoWebViewProvider : IWebViewProvider {
             val settings = GeckoSessionSettings()
             settings.setBoolean(GeckoSessionSettings.USE_MULTIPROCESS, true)
             settings.setBoolean(GeckoSessionSettings.USE_PRIVATE_MODE, true)
-            settings.setBoolean(GeckoSessionSettings.SUSPEND_MEDIA_WHEN_INACTIVE, true)
 
             return GeckoSession(settings)
         }
@@ -213,10 +210,15 @@ class GeckoWebViewProvider : IWebViewProvider {
         }
 
         override fun setRequestDesktop(shouldRequestDesktop: Boolean) {
-            geckoSession.settings.setBoolean(
-                GeckoSessionSettings.USE_DESKTOP_MODE,
-                shouldRequestDesktop
-            )
+            if ( shouldRequestDesktop ) {
+                geckoSession.settings.setInt(
+                        GeckoSessionSettings.USER_AGENT_MODE, GeckoSessionSettings.USER_AGENT_MODE_DESKTOP
+                )
+            } else {
+                geckoSession.settings.setInt(
+                        GeckoSessionSettings.USER_AGENT_MODE, GeckoSessionSettings.USER_AGENT_MODE_MOBILE
+                )
+            }
             callback?.onRequestDesktopStateChanged(shouldRequestDesktop)
         }
 
@@ -237,7 +239,8 @@ class GeckoWebViewProvider : IWebViewProvider {
                 -> geckoRuntime!!.settings.webFontsEnabled =
                         !Settings.getInstance(context).shouldBlockWebFonts()
                 context.getString(R.string.pref_key_remote_debugging) ->
-                    geckoRuntime!!.settings.remoteDebuggingEnabled = false
+                   geckoRuntime!!.settings.remoteDebuggingEnabled =
+                           Settings.getInstance(context).shouldEnableRemoteDebugging()
                 context.getString(R.string.pref_key_performance_enable_cookies) -> {
                     val cookiesValue = if (Settings.getInstance(context).shouldBlockCookies() &&
                         Settings.getInstance(context).shouldBlockThirdPartyCookies()
@@ -470,6 +473,11 @@ class GeckoWebViewProvider : IWebViewProvider {
                     throw IllegalStateException()
                 }
 
+                override fun onLoadError(session: GeckoSession?, uri: String?, category: Int, error: Int) : GeckoResult<String>? {
+                    // TODO("not implemented")
+                    return null;
+                }
+
                 override fun onLocationChange(session: GeckoSession, url: String) {
                     var desiredUrl = url
                     // Save internal data: urls we should override to present focus:about, focus:rights
@@ -620,7 +628,7 @@ class GeckoWebViewProvider : IWebViewProvider {
         ) {
             isLoadingInternalUrl = historyURL == LocalizedContent.URL_RIGHTS || historyURL ==
                     LocalizedContent.URL_ABOUT
-            geckoSession.loadData(data.toByteArray(Charsets.UTF_8), mimeType, baseURL)
+            geckoSession.loadData(data.toByteArray(Charsets.UTF_8), mimeType)
             currentUrl = historyURL
         }
 

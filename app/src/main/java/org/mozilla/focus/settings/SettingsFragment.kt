@@ -14,8 +14,9 @@ class SettingsFragment : BaseSettingsFragment(), SharedPreferences.OnSharedPrefe
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.settings)
-        // TODO: #2869 Enable Debugging and Expose Advanced Setting
-        preferenceScreen.removePreference(findPreference(getString(R.string.pref_key_advanced_screen)))
+        //if (!AppConstants.INSTANCE.isGeckoBuild()) {
+        //    getPreferenceScreen().removePreference(findPreference(getString(R.string.pref_key_advanced_screen)));
+        //}
     }
 
     override fun onResume() {

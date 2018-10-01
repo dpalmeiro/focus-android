@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import org.mozilla.focus.R;
+import org.mozilla.geckoview.GeckoResult;
 import org.mozilla.geckoview.GeckoSession;
 import org.mozilla.geckoview.GeckoSession.PermissionDelegate.MediaSource;
 
@@ -68,6 +69,14 @@ public final class GeckoViewPrompt implements GeckoSession.PromptDelegate {
             modifiableSelected = choice.selected;
             modifiableLabel = choice.label;
         }
+    }
+
+    @Override
+    public GeckoResult<Boolean> onPopupRequest(GeckoSession session, String uri) {
+       //TODO: Not implemented
+        GeckoResult<Boolean> result = new GeckoResult<>();
+        result.complete(false);
+        return result;
     }
 
     public GeckoViewPrompt(final Activity activity) {
