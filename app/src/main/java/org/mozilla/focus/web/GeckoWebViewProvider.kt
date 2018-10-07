@@ -79,6 +79,7 @@ class GeckoWebViewProvider : IWebViewProvider {
             // Safe browsing is not ready #3309
             runtimeSettingsBuilder.blockMalware(false)
             runtimeSettingsBuilder.blockPhishing(false)
+            runtimeSettingsBuilder.remoteDebuggingEnabled(true)
             geckoRuntime =
                     GeckoRuntime.create(context.applicationContext, runtimeSettingsBuilder.build())
         }
@@ -238,9 +239,9 @@ class GeckoWebViewProvider : IWebViewProvider {
                 context.getString(R.string.pref_key_performance_block_webfonts)
                 -> geckoRuntime!!.settings.webFontsEnabled =
                         !Settings.getInstance(context).shouldBlockWebFonts()
-                context.getString(R.string.pref_key_remote_debugging) ->
-                   geckoRuntime!!.settings.remoteDebuggingEnabled =
-                           Settings.getInstance(context).shouldEnableRemoteDebugging()
+                context.getString(R.string.pref_key_remote_debugging)
+                -> geckoRuntime!!.settings.remoteDebuggingEnabled =
+                        Settings.getInstance(context).shouldEnableRemoteDebugging()
                 context.getString(R.string.pref_key_performance_enable_cookies) -> {
                     val cookiesValue = if (Settings.getInstance(context).shouldBlockCookies() &&
                         Settings.getInstance(context).shouldBlockThirdPartyCookies()
@@ -263,7 +264,8 @@ class GeckoWebViewProvider : IWebViewProvider {
                     !Settings.getInstance(context).shouldBlockJavaScript()
             geckoRuntime!!.settings.webFontsEnabled =
                     !Settings.getInstance(context).shouldBlockWebFonts()
-            geckoRuntime!!.settings.remoteDebuggingEnabled = false
+            geckoRuntime!!.settings.remoteDebuggingEnabled =
+                    Settings.getInstance(context).shouldEnableRemoteDebugging()
             val cookiesValue = if (Settings.getInstance(context).shouldBlockCookies() &&
                 Settings.getInstance(context).shouldBlockThirdPartyCookies()
             ) {
