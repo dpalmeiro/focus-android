@@ -112,6 +112,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity android:name=".activity.EraseShortcutActivity"
+            android:exported="true"
             android:theme="@android:style/Theme.Translucent" />
 
         <service
@@ -134,5 +135,4 @@
         <meta-data android:name="android.webkit.WebView.MetricsOptOut"
                    android:value="true" />
     </application>
-
 </manifest>
